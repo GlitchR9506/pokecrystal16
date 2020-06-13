@@ -1957,7 +1957,6 @@ BattleCommand_LowerSub:
 
 	xor a
 	ld [wNumHits], a
-	ld [wFXAnimID + 1], a
 	inc a
 	ld [wKickCounter], a
 	ld a, SUBSTITUTE
@@ -2108,7 +2107,6 @@ BattleCommand_RaiseSub:
 
 	xor a
 	ld [wNumHits], a
-	ld [wFXAnimID + 1], a
 	ld a, $2
 	ld [wKickCounter], a
 	ld a, SUBSTITUTE
@@ -2453,7 +2451,6 @@ BattleCommand_CheckFaint:
 	call BattleCommand_SwitchTurn
 	xor a
 	ld [wNumHits], a
-	ld [wFXAnimID + 1], a
 	inc a
 	ld [wKickCounter], a
 	ld a, DESTINY_BOND
@@ -6807,15 +6804,12 @@ AnimateCurrentMove:
 	ret
 
 PlayDamageAnim:
-	xor a
-	ld [wFXAnimID + 1], a
-
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
 	and a
 	ret z
 
-	ld [wFXAnimID], a
+	call SetMoveAnimationID
 
 	ldh a, [hBattleTurn]
 	and a
@@ -6831,7 +6825,6 @@ PlayDamageAnim:
 LoadMoveAnim:
 	xor a
 	ld [wNumHits], a
-	ld [wFXAnimID + 1], a
 
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
@@ -6841,8 +6834,7 @@ LoadMoveAnim:
 	; fallthrough
 
 LoadAnim:
-	ld [wFXAnimID], a
-
+	call SetMoveAnimationID
 	; fallthrough
 
 PlayUserBattleAnim:
@@ -6852,6 +6844,16 @@ PlayUserBattleAnim:
 	callfar PlayBattleAnim
 	pop bc
 	pop de
+	pop hl
+	ret
+
+SetMoveAnimationID:
+	push hl
+	call GetMoveIndexFromID
+	ld a, l
+	ld [wFXAnimID], a
+	ld a, h
+	ld [wFXAnimID + 1], a
 	pop hl
 	ret
 
